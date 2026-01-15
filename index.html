@@ -94,6 +94,12 @@
             align-items: center;
             gap: 10px;
             cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .points-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
         
         .auth-buttons {
@@ -187,11 +193,13 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            outline: none;
         }
         
-        .option-btn:hover {
+        .option-btn:hover:not(:disabled) {
             border-color: var(--primary);
             transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .option-btn.selected {
@@ -209,6 +217,11 @@
             background: rgba(230, 57, 70, 0.1);
         }
         
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
         .option-letter {
             width: 40px;
             height: 40px;
@@ -219,6 +232,7 @@
             justify-content: center;
             font-weight: 700;
             color: var(--dark);
+            transition: all 0.3s;
         }
         
         .option-btn.selected .option-letter {
@@ -246,6 +260,7 @@
             justify-content: center;
             gap: 10px;
             flex: 1;
+            outline: none;
         }
         
         .btn-primary {
@@ -253,7 +268,7 @@
             color: white;
         }
         
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(255, 107, 53, 0.4);
         }
@@ -262,6 +277,11 @@
             background: var(--light);
             color: var(--dark);
             border: 2px solid #E5E7EB;
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: #e9ecef;
+            transform: translateY(-3px);
         }
         
         .btn-sm {
@@ -336,6 +356,7 @@
         .amount-option:hover {
             border-color: var(--primary);
             transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .amount-option.selected {
@@ -379,6 +400,7 @@
         .phone-input input:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
         }
         
         /* Pay Button */
@@ -397,9 +419,10 @@
             align-items: center;
             justify-content: center;
             gap: 15px;
+            outline: none;
         }
         
-        .pay-btn:hover {
+        .pay-btn:hover:not(:disabled) {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 100, 0, 0.4);
         }
@@ -541,11 +564,25 @@
             border-radius: 10px;
             margin-bottom: 15px;
             font-family: 'Inter', sans-serif;
+            font-size: 1rem;
         }
         
         .auth-form input:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+        
+        /* Clickable Links */
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        a:hover {
+            text-decoration: underline;
         }
         
         /* Responsive */
@@ -618,9 +655,9 @@
         </div>
         
         <!-- Warning -->
-        <div class="warning-box">
+        <div class="warning-box" id="warningBox">
             <i class="fas fa-exclamation-triangle"></i>
-            You need points to play! Deposit via M-Pesa first.
+            <span id="warningMessage">You need points to play! Deposit via M-Pesa first.</span>
         </div>
         
         <!-- Main Content -->
@@ -889,17 +926,22 @@
                 
                 <!-- Transaction History -->
                 <h3 style="color: var(--dark); margin-bottom: 15px;">Recent Transactions</h3>
-                <div style="max-height: 200px; overflow-y: auto;" id="transactionHistory">
+                <div style="max-height: 200px; overflow-y: auto; min-height: 100px;" id="transactionHistory">
                     <!-- Transactions will be loaded here -->
                 </div>
             </div>
             
-            <button id="logoutBtn" class="btn btn-secondary" style="margin-right: 10px;">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-            <button id="closeProfile" class="btn btn-primary">
-                <i class="fas fa-times"></i> Close
-            </button>
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button id="cashOutBtn" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-money-bill-wave"></i> Cash Out
+                </button>
+                <button id="logoutBtn" class="btn btn-secondary" style="flex: 1;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+                <button id="closeProfile" class="btn" style="background: #E5E7EB; color: #666; flex: 0.5;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -959,12 +1001,14 @@
             <p style="color: #666; margin-bottom: 25px;">
                 Payment expires in <span id="timerSeconds">60</span> seconds
             </p>
-            <button id="cancelPayment" class="btn btn-secondary" style="margin-right: 10px;">
-                Cancel Payment
-            </button>
-            <button id="checkPayment" class="btn btn-primary">
-                <i class="fas fa-sync-alt"></i> Check Status
-            </button>
+            <div style="display: flex; gap: 10px;">
+                <button id="cancelPayment" class="btn btn-secondary" style="flex: 1;">
+                    Cancel Payment
+                </button>
+                <button id="checkPayment" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-sync-alt"></i> Check Status
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1004,7 +1048,7 @@
                 },
                 failed: {
                     success: false,
-                    message: "Payment failed. Insufficient funds or user cancelled"
+                    message: "Payment failed. User cancelled or insufficient funds"
                 }
             }
         };
@@ -1087,13 +1131,22 @@
         // INITIALIZATION
         // ==============================================
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing KayKSH Game...');
             initializeAuth();
             initializeGame();
             setupEventListeners();
             updateUI();
+            
+            // Show welcome modal on first visit
+            setTimeout(() => {
+                if (!gameState.isAuthenticated) {
+                    showResultModal('info', 'Welcome to KayKSH!', 'Create an account or login to play trivia and win real money.');
+                }
+            }, 1000);
         });
 
         function initializeAuth() {
+            console.log('Initializing authentication...');
             // Check if user is already logged in
             const savedUser = localStorage.getItem('kayksh_currentUser');
             if (savedUser) {
@@ -1110,14 +1163,14 @@
                         gameState.phoneNumber = gameState.currentUser.phone;
                     }
                     
+                    console.log('User logged in:', gameState.currentUser.name);
                     updateAuthUI();
                     updatePlayButton();
                     updatePayButton();
                     
                     // Hide warning if user has points
-                    if (gameState.currentUser.points >= 100) {
-                        document.querySelector('.warning-box').style.display = 'none';
-                    }
+                    updateWarningMessage();
+                    
                 } catch (e) {
                     console.error('Error loading user data:', e);
                     localStorage.removeItem('kayksh_currentUser');
@@ -1129,14 +1182,19 @@
             if (savedUsers) {
                 try {
                     gameState.users = JSON.parse(savedUsers);
+                    console.log('Loaded', gameState.users.length, 'users from storage');
                 } catch (e) {
                     console.error('Error loading users:', e);
                     gameState.users = [];
                 }
+            } else {
+                gameState.users = [];
+                console.log('No users found, starting fresh');
             }
         }
 
         function initializeGame() {
+            console.log('Initializing game...');
             updatePointsDisplay();
             updatePlayButton();
             updatePayButton();
@@ -1144,6 +1202,8 @@
         }
 
         function setupEventListeners() {
+            console.log('Setting up event listeners...');
+            
             // Play button
             document.getElementById('playBtn').addEventListener('click', startGame);
             
@@ -1179,6 +1239,7 @@
             
             // Profile Modal
             document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+            document.getElementById('cashOutBtn').addEventListener('click', cashOutPoints);
             document.getElementById('closeProfile').addEventListener('click', hideProfileModal);
             
             // Modals
@@ -1197,12 +1258,16 @@
             
             // Keyboard shortcuts
             document.addEventListener('keydown', handleKeyboardShortcuts);
+            
+            console.log('Event listeners set up successfully');
         }
 
         function setupAmountSelection() {
             const amountOptions = document.querySelectorAll('.amount-option');
             amountOptions.forEach(option => {
                 option.addEventListener('click', function() {
+                    console.log('Amount selected:', this.dataset.amount);
+                    
                     // Remove selection from all options
                     amountOptions.forEach(opt => opt.classList.remove('selected'));
                     
@@ -1212,6 +1277,8 @@
                     // Update game state
                     gameState.selectedAmount = parseInt(this.dataset.amount);
                     gameState.selectedPoints = parseInt(this.dataset.points);
+                    
+                    console.log('Selected:', gameState.selectedAmount, 'for', gameState.selectedPoints, 'points');
                 });
             });
         }
@@ -1244,21 +1311,12 @@
                 updatePlayButton();
                 updatePayButton();
                 
-                // Hide warning if user has points
-                if (gameState.currentUser.points >= 100) {
-                    document.querySelector('.warning-box').style.display = 'none';
-                } else {
-                    document.querySelector('.warning-box').style.display = 'flex';
-                }
+                // Update warning message
+                updateWarningMessage();
                 
                 // Update question text
-                if (gameState.currentUser.points < 100) {
-                    document.getElementById('questionText').textContent = 
-                        'You need at least 100 points to play. Deposit points to continue!';
-                } else {
-                    document.getElementById('questionText').textContent = 
-                        'Ready to play! Click "Play Game" to start.';
-                }
+                updateQuestionText();
+                
             } else {
                 // Show auth buttons
                 authButtons.style.display = 'flex';
@@ -1270,7 +1328,37 @@
             }
         }
 
+        function updateWarningMessage() {
+            const warningBox = document.getElementById('warningBox');
+            const warningMessage = document.getElementById('warningMessage');
+            
+            if (!gameState.isAuthenticated) {
+                warningMessage.textContent = 'Please login or register to play!';
+                warningBox.style.display = 'flex';
+            } else if (gameState.points < 100) {
+                warningMessage.textContent = 'You need at least 100 points to play! Deposit via M-Pesa first.';
+                warningBox.style.display = 'flex';
+            } else {
+                warningBox.style.display = 'none';
+            }
+        }
+
+        function updateQuestionText() {
+            if (!gameState.isAuthenticated) {
+                document.getElementById('questionText').textContent = 
+                    'Please login or register to play trivia and win money!';
+            } else if (gameState.points < 100) {
+                document.getElementById('questionText').textContent = 
+                    'You need at least 100 points to play. Deposit points to continue!';
+            } else if (!gameState.isPlaying) {
+                document.getElementById('questionText').textContent = 
+                    'Ready to play! Click "Play Game" to start.';
+            }
+        }
+
         function registerUser(name, email, phone, password) {
+            console.log('Registering user:', email);
+            
             // Validate inputs
             if (!name || !email || !phone || !password) {
                 return { success: false, message: 'All fields are required' };
@@ -1314,12 +1402,15 @@
             
             // Save to localStorage
             localStorage.setItem('kayksh_users', JSON.stringify(gameState.users));
+            console.log('User registered successfully:', email);
             
             // Auto login after registration
             return loginUser(email, password);
         }
 
         function loginUser(email, password) {
+            console.log('Logging in user:', email);
+            
             // Find user
             const user = gameState.users.find(u => u.email === email && u.password === password);
             
@@ -1347,10 +1438,13 @@
             updateAuthUI();
             updateUI();
             
+            console.log('Login successful for:', user.name);
             return { success: true, user: user };
         }
 
         function logoutUser() {
+            console.log('Logging out user');
+            
             // Save user data before logout
             saveUserData();
             
@@ -1384,6 +1478,8 @@
         function saveUserData() {
             if (!gameState.currentUser) return;
             
+            console.log('Saving user data for:', gameState.currentUser.name);
+            
             // Update current user data from game state
             gameState.currentUser.points = gameState.points;
             gameState.currentUser.gamesPlayed = gameState.gamesPlayed;
@@ -1399,6 +1495,8 @@
             // Save to localStorage
             localStorage.setItem('kayksh_users', JSON.stringify(gameState.users));
             localStorage.setItem('kayksh_currentUser', JSON.stringify(gameState.currentUser));
+            
+            console.log('User data saved successfully');
         }
 
         function loadUserStats() {
@@ -1476,6 +1574,7 @@
         }
 
         function showAuthModal(form = 'login') {
+            console.log('Showing auth modal:', form);
             const modal = document.getElementById('authModal');
             
             // Clear form fields
@@ -1507,6 +1606,7 @@
                 return;
             }
             
+            console.log('Showing profile modal');
             loadUserStats();
             document.getElementById('profileModal').style.display = 'flex';
         }
@@ -1578,9 +1678,12 @@
             }
             
             gameState.phoneNumber = phoneInput.value;
+            console.log('Phone number updated:', gameState.phoneNumber);
         }
 
         async function initiatePayment() {
+            console.log('Initiating payment...');
+            
             // Check authentication
             if (!gameState.isAuthenticated) {
                 showAuthModal('login');
@@ -1618,6 +1721,8 @@
             payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             
             try {
+                console.log('Processing STK Push for:', gameState.phoneNumber, 'Amount:', gameState.selectedAmount);
+                
                 // DEMO MODE - Simulate payment
                 if (PAYHERO_CONFIG.demoMode) {
                     console.log('Demo: Sending STK Push to', gameState.phoneNumber);
@@ -1647,6 +1752,8 @@
         }
 
         function handleSuccessfulPayment(transactionId = null) {
+            console.log('Payment successful! Adding points:', gameState.selectedPoints);
+            
             // Add points to user account
             gameState.points += gameState.selectedPoints;
             
@@ -1690,6 +1797,7 @@
         }
 
         function showPaymentModal() {
+            console.log('Showing payment modal');
             document.getElementById('processingAmount').textContent = 
                 `KSh ${gameState.selectedAmount}`;
             document.getElementById('processingPhone').textContent = 
@@ -1703,6 +1811,7 @@
         }
 
         function hidePaymentModal() {
+            console.log('Hiding payment modal');
             const modal = document.getElementById('paymentModal');
             modal.style.display = 'none';
             
@@ -1714,6 +1823,7 @@
         }
 
         function startPaymentTimer() {
+            console.log('Starting payment timer');
             let seconds = 60;
             const timerElement = document.getElementById('paymentTimer');
             const secondsElement = document.getElementById('timerSeconds');
@@ -1739,12 +1849,14 @@
         }
 
         function paymentTimeout() {
+            console.log('Payment timeout');
             gameState.paymentInProgress = false;
             showPaymentStatus('error', 'Payment timeout. Please try again.');
             hidePaymentModal();
         }
 
         function cancelPayment() {
+            console.log('Cancelling payment');
             if (gameState.paymentTimeout) {
                 clearTimeout(gameState.paymentTimeout);
             }
@@ -1754,6 +1866,7 @@
         }
 
         function checkPaymentStatus() {
+            console.log('Checking payment status');
             // In real implementation, check with your backend
             showPaymentStatus('info', 'Checking payment status...');
             
@@ -1776,6 +1889,7 @@
         }
 
         function showPaymentStatus(type, message) {
+            console.log('Payment status:', type, message);
             const statusElement = document.getElementById('paymentStatus');
             statusElement.className = `payment-status ${type}`;
             statusElement.innerHTML = `
@@ -1827,6 +1941,7 @@
         }
 
         function loadRandomQuestion() {
+            console.log('Loading random question...');
             const randomIndex = Math.floor(Math.random() * triviaQuestions.length);
             gameState.currentQuestion = triviaQuestions[randomIndex];
             
@@ -1867,13 +1982,19 @@
                     this.classList.add('selected');
                     gameState.selectedAnswer = answer;
                     document.getElementById('submitBtn').disabled = false;
+                    
+                    console.log('Answer selected:', answer);
                 });
                 
                 optionsContainer.appendChild(optionBtn);
             });
+            
+            console.log('Question loaded:', gameState.currentQuestion.question);
         }
 
         function startGame() {
+            console.log('Starting game...');
+            
             // Check authentication
             if (!gameState.isAuthenticated) {
                 showAuthModal('login');
@@ -1925,9 +2046,13 @@
             
             // Load question
             loadRandomQuestion();
+            
+            console.log('Game started successfully');
         }
 
         function submitAnswer() {
+            console.log('Submitting answer:', gameState.selectedAnswer);
+            
             if (!gameState.selectedAnswer || !gameState.currentQuestion) return;
             
             clearInterval(gameState.timerInterval);
@@ -1966,6 +2091,7 @@
                 updatePlayButton();
                 updateStats();
                 
+                console.log('Correct answer! Won', prize, 'points');
                 showResultModal('success', 'Correct Answer!', 
                     `You won ${prize} points! You now have ${gameState.points} points.`);
             } else {
@@ -1977,6 +2103,7 @@
                 }
                 
                 updateStats();
+                console.log('Wrong answer. Correct was:', gameState.currentQuestion.correct_answer);
                 showResultModal('error', 'Wrong Answer', 
                     `Correct answer: ${gameState.currentQuestion.correct_answer}. ` +
                     `You lost 100 points. You have ${gameState.points} points remaining.`);
@@ -1987,6 +2114,7 @@
         }
 
         function handleTimeUp() {
+            console.log('Time up!');
             gameState.gamesPlayed++;
             
             // Update user data
@@ -2006,6 +2134,7 @@
         }
 
         function resetGame() {
+            console.log('Resetting game...');
             gameState.isPlaying = false;
             gameState.selectedAnswer = null;
             
@@ -2053,6 +2182,7 @@
         // MODAL FUNCTIONS
         // ==============================================
         function showResultModal(type, title, message) {
+            console.log('Showing result modal:', type, title);
             const modal = document.getElementById('resultModal');
             const icon = document.getElementById('resultIcon');
             const titleElement = document.getElementById('resultTitle');
@@ -2114,6 +2244,8 @@
         // CASH OUT FUNCTIONALITY
         // ==============================================
         function cashOutPoints() {
+            console.log('Cash out requested');
+            
             if (!gameState.isAuthenticated) {
                 showAuthModal('login');
                 return;
@@ -2152,11 +2284,11 @@
             updatePointsDisplay();
             updateAuthUI();
             updatePlayButton();
+            
+            // Hide profile modal
+            hideProfileModal();
         }
 
-        // Add cash out button to profile modal (optional)
-        // You can add this button in the profile modal HTML if needed
-        
     </script>
 </body>
 </html>
