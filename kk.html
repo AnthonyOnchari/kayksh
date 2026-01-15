@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Cash - Play & Win</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --dark: #1F2937;
+            --light: #F9FAFB;
+            --gray: #6B7280;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .points-display {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+        }
+
+        /* Game Area */
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .game-header p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        /* Question Box */
+        .question-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .question-box h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Options */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option-btn {
+            padding: 18px 20px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            background: white;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            padding-left: 60px;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .option-btn.selected {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .option-btn.correct {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .option-btn.wrong {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .option-letter {
+            position: absolute;
+            left: 20px;
+            width: 30px;
+            height: 30px;
+            background: #F3F4F6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .option-btn.selected .option-letter {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Game Controls */
+        .game-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid #E5E7EB;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Timer */
+        .timer {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .timer-circle {
+            width: 80px;
+            height: 80px;
+            border: 5px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Deposit Card */
+        .deposit-amounts {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .amount-option {
+            padding: 15px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .amount-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .amount-option.selected {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .amount-option .price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .amount-option .points {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .pay-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pay-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Stats Card */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 12px;
+        }
+
+        .stat-item .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-item .label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Recent Games */
+        .game-history {
+            list-style: none;
+        }
+
+        .game-history li {
+            padding: 12px 15px;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-history li:last-child {
+            border-bottom: none;
+        }
+
+        .game-result.win {
+            color: var(--success);
+        }
+
+        .game-result.loss {
+            color: var(--danger);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-header i.success {
+            color: var(--success);
+        }
+
+        .modal-header i.error {
+            color: var(--danger);
+        }
+
+        .modal-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .deposit-amounts {
+                grid-template-columns: 1fr;
+            }
+
+            .game-controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <div>
+                    <h1>Trivia Cash</h1>
+                    <p style="font-size: 0.9rem; color: var(--gray);">Play. Win. Earn.</p>
+                </div>
+            </div>
+            <div class="points-display">
+                <i class="fas fa-coins"></i>
+                <span id="userPoints">1,000</span> Points
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Column: Game Area -->
+            <div class="game-card">
+                <div class="game-header">
+                    <h2>Quick Trivia Challenge</h2>
+                    <p>Answer correctly to win points. Wrong answer loses entry fee.</p>
+                </div>
+
+                <!-- Timer -->
+                <div class="timer">
+                    <div class="timer-circle">
+                        <span id="countdown">30</span>
+                    </div>
+                    <p>Seconds remaining</p>
+                </div>
+
+                <!-- Question -->
+                <div class="question-box">
+                    <h3 id="questionText">What is the capital city of Kenya?</h3>
+                    <div class="question-meta">
+                        <span id="questionCategory">Geography</span>
+                        <span id="questionDifficulty">Medium</span>
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="options-grid" id="optionsContainer">
+                    <!-- Options will be loaded here -->
+                </div>
+
+                <!-- Game Controls -->
+                <div class="game-controls">
+                    <button id="playBtn" class="btn btn-primary">
+                        <i class="fas fa-play"></i>
+                        Play Game (100 Points)
+                    </button>
+                    <button id="submitBtn" class="btn btn-secondary" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Answer
+                    </button>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px; color: var(--gray);">
+                    <p><i class="fas fa-info-circle"></i> Entry: 100 Points | Prize: 500 Points</p>
+                </div>
+            </div>
+
+            <!-- Right Column: Sidebar -->
+            <div class="sidebar">
+                <!-- Deposit Card -->
+                <div class="card">
+                    <h3><i class="fas fa-wallet"></i> Buy Points</h3>
+                    <p style="color: var(--gray); margin-bottom: 20px;">Deposit via M-Pesa STK Push</p>
+                    
+                    <div class="deposit-amounts">
+                        <div class="amount-option" data-amount="50" data-points="500">
+                            <div class="price">KSh 50</div>
+                            <div class="points">500 Points</div>
+                        </div>
+                        <div class="amount-option selected" data-amount="100" data-points="1200">
+                            <div class="price">KSh 100</div>
+                            <div class="points">1,200 Points</div>
+                        </div>
+                        <div class="amount-option" data-amount="200" data-points="2500">
+                            <div class="price">KSh 200</div>
+                            <div class="points">2,500 Points</div>
+                        </div>
+                        <div class="amount-option" data-amount="500" data-points="7000">
+                            <div class="price">KSh 500</div>
+                            <div class="points">7,000 Points</div>
+                        </div>
+                    </div>
+
+                    <button id="depositBtn" class="pay-btn">
+                        <i class="fas fa-mobile-alt"></i>
+                        Pay via M-Pesa
+                    </button>
+
+                    <p style="font-size: 0.85rem; color: var(--gray); text-align: center; margin-top: 15px;">
+                        <i class="fas fa-shield-alt"></i> Secure payment via PayHero
+                    </p>
+                </div>
+
+                <!-- Stats Card -->
+                <div class="card">
+                    <h3><i class="fas fa-chart-line"></i> Your Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="number" id="gamesPlayed">24</div>
+                            <div class="label">Games Played</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="number" id="gamesWon">18</div>
+                            <div class="label">Games Won</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="number" id="winRate">75%</div>
+                            <div class="label">Win Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="number" id="totalWon">9,500</div>
+                            <div class="label">Points Won</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Games -->
+                <div class="card">
+                    <h3><i class="fas fa-history"></i> Recent Games</h3>
+                    <ul class="game-history" id="recentGames">
+                        <!-- Recent games will be loaded here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <i class="fas fa-trophy success" id="resultIcon"></i>
+                <h2 id="resultTitle">You Won!</h2>
+                <p id="resultMessage">Congratulations! You won 500 points.</p>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal()" style="width: 100%;">
+                Continue Playing
+            </button>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closePaymentModal()">&times;</button>
+            <div class="modal-header">
+                <i class="fas fa-mobile-alt" style="color: var(--primary); font-size: 3rem;"></i>
+                <h2>Complete Payment</h2>
+                <p>You will receive an M-Pesa STK Push on your phone</p>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <h3 style="font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;" id="paymentAmount">KSh 100</h3>
+                <p style="color: var(--gray);">for <span id="paymentPoints">1,200</span> Points</p>
+            </div>
+
+            <div style="background: var(--light); padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+                <h4 style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-phone"></i> Enter Your M-Pesa Number
+                </h4>
+                <input type="tel" id="phoneNumber" placeholder="07XX XXX XXX" 
+                       style="width: 100%; padding: 15px; border: 2px solid #E5E7EB; border-radius: 10px; font-size: 1rem; margin-top: 10px;">
+            </div>
+
+            <button id="confirmPaymentBtn" class="pay-btn">
+                <i class="fas fa-paper-plane"></i>
+                Send Payment Request
+            </button>
+
+            <p style="text-align: center; margin-top: 20px; font-size: 0.9rem; color: var(--gray);">
+                <i class="fas fa-lock"></i> Secure payment processed by PayHero
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            points: 1000,
+            isPlaying: false,
+            currentQuestion: null,
+            selectedAnswer: null,
+            timer: 30,
+            timerInterval: null,
+            selectedAmount: 100,
+            selectedPoints: 1200,
+            phoneNumber: "",
+            gamesPlayed: 24,
+            gamesWon: 18
+        };
+
+        // Questions Database
+        const questions = [
+            {
+                question: "What is the capital city of Kenya?",
+                category: "Geography",
+                difficulty: "Easy",
+                correct_answer: "Nairobi",
+                incorrect_answers: ["Mombasa", "Kisumu", "Nakuru"]
+            },
+            {
+                question: "Which year did Kenya gain independence?",
+                category: "History",
+                difficulty: "Medium",
+                correct_answer: "1963",
+                incorrect_answers: ["1960", "1965", "1970"]
+            },
+            {
+                question: "What is the currency of Kenya?",
+                category: "Economics",
+                difficulty: "Easy",
+                correct_answer: "Kenyan Shilling",
+                incorrect_answers: ["Kenyan Pound", "East African Shilling", "Kenyan Dollar"]
+            },
+            {
+                question: "Which lake is shared by Kenya, Tanzania, and Uganda?",
+                category: "Geography",
+                difficulty: "Medium",
+                correct_answer: "Lake Victoria",
+                incorrect_answers: ["Lake Turkana", "Lake Naivasha", "Lake Nakuru"]
+            },
+            {
+                question: "Who was the first president of Kenya?",
+                category: "History",
+                difficulty: "Medium",
+                correct_answer: "Jomo Kenyatta",
+                incorrect_answers: ["Daniel Moi", "Mwai Kibaki", "Uhuru Kenyatta"]
+            },
+            {
+                question: "What is the highest mountain in Kenya?",
+                category: "Geography",
+                difficulty: "Medium",
+                correct_answer: "Mount Kenya",
+                incorrect_answers: ["Mount Kilimanjaro", "Mount Elgon", "Mount Longonot"]
+            },
+            {
+                question: "Which ocean borders Kenya to the east?",
+                category: "Geography",
+                difficulty: "Easy",
+                correct_answer: "Indian Ocean",
+                incorrect_answers: ["Atlantic Ocean", "Pacific Ocean", "Arctic Ocean"]
+            },
+            {
+                question: "What is the official language of Kenya?",
+                category: "Language",
+                difficulty: "Easy",
+                correct_answer: "Swahili and English",
+                incorrect_answers: ["Swahili only", "English only", "Kikuyu"]
+            },
+            {
+                question: "Which Kenyan won the Nobel Peace Prize in 2004?",
+                category: "Achievements",
+                difficulty: "Hard",
+                correct_answer: "Wangari Maathai",
+                incorrect_answers: ["Barack Obama Sr.", "Jomo Kenyatta", "Dedan Kimathi"]
+            },
+            {
+                question: "What is the most popular sport in Kenya?",
+                category: "Sports",
+                difficulty: "Easy",
+                correct_answer: "Athletics (Running)",
+                incorrect_answers: ["Football", "Rugby", "Cricket"]
+            }
+        ];
+
+        // Recent Games History
+        let recentGames = [
+            { result: "win", points: 500, time: "2 min ago" },
+            { result: "win", points: 500, time: "5 min ago" },
+            { result: "loss", points: -100, time: "10 min ago" },
+            { result: "win", points: 500, time: "15 min ago" },
+            { result: "win", points: 500, time: "20 min ago" }
+        ];
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initGame();
+            loadRecentGames();
+            setupEventListeners();
+            loadRandomQuestion();
+        });
+
+        function initGame() {
+            updatePointsDisplay();
+            updateStats();
+        }
+
+        function setupEventListeners() {
+            // Play button
+            document.getElementById('playBtn').addEventListener('click', startGame);
+            
+            // Submit button
+            document.getElementById('submitBtn').addEventListener('click', submitAnswer);
+            
+            // Deposit amount selection
+            document.querySelectorAll('.amount-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.amount-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    
+                    gameState.selectedAmount = parseInt(this.dataset.amount);
+                    gameState.selectedPoints = parseInt(this.dataset.points);
+                });
+            });
+            
+            // Deposit button
+            document.getElementById('depositBtn').addEventListener('click', openPaymentModal);
+            
+            // Confirm payment button
+            document.getElementById('confirmPaymentBtn').addEventListener('click', processPayment);
+        }
+
+        function loadRandomQuestion() {
+            const randomIndex = Math.floor(Math.random() * questions.length);
+            gameState.currentQuestion = questions[randomIndex];
+            
+            // Update question display
+            document.getElementById('questionText').textContent = gameState.currentQuestion.question;
+            document.getElementById('questionCategory').textContent = gameState.currentQuestion.category;
+            document.getElementById('questionDifficulty').textContent = gameState.currentQuestion.difficulty;
+            
+            // Clear options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            // Combine answers and shuffle
+            const allAnswers = [...gameState.currentQuestion.incorrect_answers, gameState.currentQuestion.correct_answer];
+            shuffleArray(allAnswers);
+            
+            // Create option buttons
+            const letters = ['A', 'B', 'C', 'D'];
+            allAnswers.forEach((answer, index) => {
+                const optionBtn = document.createElement('button');
+                optionBtn.className = 'option-btn';
+                optionBtn.innerHTML = `
+                    <span class="option-letter">${letters[index]}</span>
+                    ${answer}
+                `;
+                optionBtn.dataset.answer = answer;
+                
+                optionBtn.addEventListener('click', function() {
+                    // Deselect all options
+                    document.querySelectorAll('.option-btn').forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                    
+                    // Select this option
+                    this.classList.add('selected');
+                    gameState.selectedAnswer = answer;
+                    document.getElementById('submitBtn').disabled = false;
+                });
+                
+                optionsContainer.appendChild(optionBtn);
+            });
+        }
+
+        function startGame() {
+            if (gameState.points < 100) {
+                showResult('error', 'Not Enough Points', 'You need at least 100 points to play. Buy more points to continue.');
+                return;
+            }
+            
+            if (gameState.isPlaying) return;
+            
+            // Deduct entry fee
+            updatePoints(-100, 'Game Entry Fee');
+            addRecentGame('loss', -100);
+            
+            gameState.isPlaying = true;
+            gameState.selectedAnswer = null;
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('playBtn').disabled = true;
+            document.getElementById('playBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Game in Progress';
+            
+            // Reset timer
+            gameState.timer = 30;
+            document.getElementById('countdown').textContent = gameState.timer;
+            
+            // Start timer
+            clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(() => {
+                gameState.timer--;
+                document.getElementById('countdown').textContent = gameState.timer;
+                
+                if (gameState.timer <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    handleTimeUp();
+                }
+            }, 1000);
+            
+            // Load new question
+            loadRandomQuestion();
+        }
+
+        function submitAnswer() {
+            if (!gameState.selectedAnswer || !gameState.currentQuestion) return;
+            
+            clearInterval(gameState.timerInterval);
+            
+            const isCorrect = gameState.selectedAnswer === gameState.currentQuestion.correct_answer;
+            
+            // Show correct/incorrect styling
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.answer === gameState.currentQuestion.correct_answer) {
+                    btn.classList.add('correct');
+                } else if (btn.classList.contains('selected') && !isCorrect) {
+                    btn.classList.add('wrong');
+                }
+            });
+            
+            gameState.gamesPlayed++;
+            
+            if (isCorrect) {
+                // Win prize
+                const prize = 500;
+                updatePoints(prize, 'Game Win');
+                gameState.gamesWon++;
+                addRecentGame('win', prize);
+                showResult('success', 'Correct Answer!', `You won ${prize} points!`);
+            } else {
+                addRecentGame('loss', 0);
+                showResult('error', 'Wrong Answer', `Correct answer: ${gameState.currentQuestion.correct_answer}`);
+            }
+            
+            // Update stats
+            updateStats();
+            
+            // Reset game after delay
+            setTimeout(() => {
+                resetGame();
+            }, 3000);
+        }
+
+        function handleTimeUp() {
+            addRecentGame('loss', 0);
+            showResult('error', 'Time\'s Up!', 'You ran out of time.');
+            
+            setTimeout(() => {
+                resetGame();
+            }, 3000);
+        }
+
+        function resetGame() {
+            gameState.isPlaying = false;
+            gameState.selectedAnswer = null;
+            
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i> Play Game (100 Points)';
+            
+            // Load new question
+            loadRandomQuestion();
+        }
+
+        // Payment Functions
+        function openPaymentModal() {
+            document.getElementById('paymentAmount').textContent = `KSh ${gameState.selectedAmount}`;
+            document.getElementById('paymentPoints').textContent = gameState.selectedPoints.toLocaleString();
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function processPayment() {
+            const phoneInput = document.getElementById('phoneNumber');
+            const phoneNumber = phoneInput.value.trim();
+            
+            // Validate phone number (basic Kenyan number validation)
+            if (!phoneNumber.match(/^07[0-9]{8}$/)) {
+                alert('Please enter a valid Kenyan phone number (07XXXXXXXX)');
+                phoneInput.focus();
+                return;
+            }
+            
+            gameState.phoneNumber = phoneNumber;
+            
+            // Show processing
+            const confirmBtn = document.getElementById('confirmPaymentBtn');
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            confirmBtn.disabled = true;
+            
+            // Simulate API call to PayHero
+            setTimeout(() => {
+                // In real implementation, you would call:
+                // fetch('https://short.payhero.co.ke/s/34UsaC2LVdvkDjk5xz2tri', {
+                //     method: 'POST',
+                //     headers: {'Content-Type': 'application/json'},
+                //     body: JSON.stringify({
+                //         amount: gameState.selectedAmount,
+                //         phone: gameState.phoneNumber,
+                //         user_id: 'current_user_id'
+                //     })
+                // })
+                
+                // Simulate successful payment
+                updatePoints(gameState.selectedPoints, `Deposit: KSh ${gameState.selectedAmount}`);
+                addRecentGame('deposit', gameState.selectedPoints);
+                
+                // Reset button
+                confirmBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Payment Request';
+                confirmBtn.disabled = false;
+                
+                // Close modal
+                closePaymentModal();
+                
+                // Clear phone input
+                phoneInput.value = '';
+                
+                // Show success message
+                showResult('success', 'Payment Successful!', `${gameState.selectedPoints} points added to your account. Check your M-Pesa for confirmation.`);
+                
+            }, 2000);
+        }
+
+        // UI Update Functions
+        function updatePointsDisplay() {
+            document.getElementById('userPoints').textContent = gameState.points.toLocaleString();
+        }
+
+        function updatePoints(amount, description) {
+            gameState.points += amount;
+            updatePointsDisplay();
+        }
+
+        function updateStats() {
+            document.getElementById('gamesPlayed').textContent = gameState.gamesPlayed;
+            document.getElementById('gamesWon').textContent = gameState.gamesWon;
+            
+            const winRate = Math.round((gameState.gamesWon / gameState.gamesPlayed) * 100) || 0;
+            document.getElementById('winRate').textContent = `${winRate}%`;
+            
+            // Calculate total points won (simplified)
+            const totalWon = gameState.gamesWon * 500;
+            document.getElementById('totalWon').textContent = totalWon.toLocaleString();
+        }
+
+        function loadRecentGames() {
+            const container = document.getElementById('recentGames');
+            container.innerHTML = '';
+            
+            recentGames.forEach(game => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>
+                        <i class="fas fa-gamepad"></i>
+                        Trivia Game
+                    </span>
+                    <span class="game-result ${game.result}">
+                        ${game.result === 'win' ? '+' : ''}${game.points} points
+                        <small style="margin-left: 10px; color: var(--gray);">${game.time}</small>
+                    </span>
+                `;
+                container.appendChild(li);
+            });
+        }
+
+        function addRecentGame(result, points) {
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            recentGames.unshift({
+                result: result,
+                points: points,
+                time: time
+            });
+            
+            // Keep only last 5 games
+            if (recentGames.length > 5) {
+                recentGames.pop();
+            }
+            
+            loadRecentGames();
+        }
+
+        function showResult(type, title, message) {
+            const modal = document.getElementById('resultModal');
+            const icon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            
+            if (type === 'success') {
+                icon.className = 'fas fa-trophy success';
+                resultTitle.style.color = 'var(--success)';
+            } else {
+                icon.className = 'fas fa-times error';
+                resultTitle.style.color = 'var(--danger)';
+            }
+            
+            resultTitle.textContent = title;
+            resultMessage.textContent = message;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').style.display = 'none';
+        }
+
+        // Utility Functions
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const resultModal = document.getElementById('resultModal');
+            const paymentModal = document.getElementById('paymentModal');
+            
+            if (event.target === resultModal) {
+                resultModal.style.display = 'none';
+            }
+            if (event.target === paymentModal) {
+                paymentModal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
